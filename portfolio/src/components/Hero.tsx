@@ -1,8 +1,72 @@
-import React from 'react';
-import { ArrowRight, Brain, Activity } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowRight, Brain, Activity, FileCode } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 
+// Add your custom Python files here:
+const CODE_SNIPPETS = [
+    {
+        filename: "transformer_model.py",
+        device: "CUDA:0",
+        status: "Loss: 0.0124 | Acc: 98.6%",
+        code: (
+            <>
+                <div className="text-slate-500"># Custom Transformer Block</div>
+                <div>
+                    <span className="text-purple-400">import</span> <span className="text-cyan-400">torch</span>
+                    <br />
+                    <span className="text-purple-400">import</span> <span className="text-cyan-400">torch.nn</span> <span className="text-purple-400">as</span> <span className="text-slate-300">nn</span>
+                </div>
+                <div className="pt-2">
+                    <span className="text-purple-400">class</span> <span className="text-yellow-300">AttentionBlock</span>(<span className="text-cyan-400">nn.Module</span>):
+                </div>
+                <div className="pl-4 space-y-1 text-slate-400">
+                    <div>
+                        <span className="text-purple-400">def</span> <span className="text-blue-400">__init__</span>(self, d_model=512, n_heads=8):
+                    </div>
+                    <div className="pl-4">super().__init__()</div>
+                    <div className="pl-4">self.qkv_proj = <span className="text-cyan-400">nn.Linear</span>(d_model, d_model * 3)</div>
+                    <div className="pl-4">self.out_proj = <span className="text-cyan-400">nn.Linear</span>(d_model, d_model)</div>
+                </div>
+                <div className="pl-4 pt-2 space-y-1 text-slate-400">
+                    <div>
+                        <span className="text-purple-400">def</span> <span className="text-blue-400">forward</span>(self, x):
+                    </div>
+                    <div className="pl-4">q, k, v = self.qkv_proj(x).chunk(3, dim=-1)</div>
+                    <div className="pl-4">scores = (q @ k.transpose(-2, -1)) / (x.size(-1) ** 0.5)</div>
+                    <div className="pl-4"><span className="text-purple-400">return</span> self.out_proj(torch.softmax(scores, dim=-1) @ v)</div>
+                </div>
+            </>
+        )
+    },
+    {
+        filename: "train_pipeline.py",
+        device: "RTX 4090",
+        status: "Epoch 42/100 | LR: 1e-4",
+        code: (
+            <>
+                <div className="text-slate-500"># Model Training & Optimization Loop</div>
+                <div>
+                    <span className="text-purple-400">optimizer</span> = <span className="text-cyan-400">torch.optim.AdamW</span>(model.parameters(), lr=1e-4)
+                </div>
+                <div className="pt-2">
+                    <span className="text-purple-400">for</span> epoch <span className="text-purple-400">in</span> range(epochs):
+                </div>
+                <div className="pl-4 space-y-1 text-slate-400">
+                    <div>optimizer.zero_grad()</div>
+                    <div>loss = criterion(model(inputs), targets)</div>
+                    <div>loss.backward()</div>
+                    <div>torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)</div>
+                    <div>optimizer.step()</div>
+                </div>
+            </>
+        )
+    }
+];
+
 export const Hero: React.FC = () => {
+    const [activeTab, setActiveTab] = useState(0);
+    const currentSnippet = CODE_SNIPPETS[activeTab];
+
     return (
         <section id="hero" className="min-h-screen pt-32 pb-20 flex items-center relative z-10">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
@@ -59,64 +123,45 @@ export const Hero: React.FC = () => {
 
                     <div className="lg:col-span-5">
                         <div className="bg-surface/90 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
-                            <div className="bg-surfaceLight/80 px-4 py-3 border-b border-white/5 flex items-center justify-between">
+                            {/* Window Header with Clickable Tabs */}
+                            <div className="bg-surfaceLight/80 px-4 py-2.5 border-b border-white/5 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                                    <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                                    <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                                    <span className="text-xs font-mono text-slate-400 ml-2">torch_runtime.py</span>
+                                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
+                                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></div>
+                                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/80"></div>
+
+                                    <div className="flex items-center gap-1 ml-2">
+                                        {CODE_SNIPPETS.map((snippet, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setActiveTab(idx)}
+                                                className={`text-xs font-mono px-2.5 py-1 rounded flex items-center gap-1.5 transition-colors ${activeTab === idx
+                                                        ? 'bg-white/10 text-cyan-300 font-semibold'
+                                                        : 'text-slate-500 hover:text-slate-300'
+                                                    }`}
+                                            >
+                                                <FileCode className="w-3 h-3" />
+                                                <span>{snippet.filename}</span>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-1.5 text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+
+                                <div className="flex items-center gap-1 text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
                                     <Activity className="w-3 h-3 animate-spin" />
-                                    <span>CUDA:0</span>
+                                    <span>{currentSnippet.device}</span>
                                 </div>
                             </div>
 
-                            <div className="p-5 font-mono text-xs space-y-2.5 text-slate-300">
-                                <div className="text-slate-500"># Model Architecture Specification</div>
-                                <div>
-                                    <span className="text-purple-400">class</span> <span className="text-yellow-300">TransformerBlock</span>(<span className="text-cyan-400">nn.Module</span>):
-                                </div>
-                                <div className="pl-4 space-y-1 text-slate-400">
-                                    <div>
-                                        <span className="text-purple-400">def</span> <span className="text-blue-400">__init__</span>(self, d_model=512, heads=12):
-                                    </div>
-                                    <div className="pl-4">
-                                        self.mha = <span className="text-cyan-400">MultiHeadAttention</span>(d_model, heads)
-                                    </div>
-                                    <div className="pl-4">
-                                        self.norm1 = <span className="text-cyan-400">LayerNorm</span>(d_model)
-                                    </div>
-                                    <div className="pl-4">
-                                        self.mlp = <span className="text-cyan-400">FeedForwardGELU</span>(d_model, 2048)
-                                    </div>
-                                </div>
+                            {/* Code Display */}
+                            <div className="p-5 font-mono text-xs space-y-2 text-slate-300 min-h-[260px]">
+                                {currentSnippet.code}
+                            </div>
 
-                                <div className="pt-2 text-slate-500"># Forward Pass Pipeline</div>
-                                <div className="pl-4 space-y-1 text-slate-400">
-                                    <div>
-                                        <span className="text-purple-400">def</span> <span className="text-blue-400">forward</span>(self, x, mask=None):
-                                    </div>
-                                    <div className="pl-4">
-                                        attn, weights = self.mha(x, x, x, mask)
-                                    </div>
-                                    <div className="pl-4">
-                                        x = self.norm1(x + attn)
-                                    </div>
-                                    <div className="pl-4">
-                                        <span className="text-purple-400">return</span> x + self.mlp(x)
-                                    </div>
-                                </div>
-
-                                <div className="p-3 bg-background/80 rounded-lg border border-emerald-500/20 mt-4 text-[11px] space-y-1 text-emerald-400">
-                                    <div className="flex items-center justify-between">
-                                        <span>Loss: 0.0124</span>
-                                        <span>Validation Acc: 98.6%</span>
-                                    </div>
-                                    <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
-                                        <div className="bg-emerald-400 h-full w-[98.6%] rounded-full"></div>
-                                    </div>
-                                </div>
+                            {/* Live Status Footer */}
+                            <div className="px-5 py-3 bg-surfaceLight/50 border-t border-white/5 text-[11px] font-mono flex items-center justify-between text-emerald-400">
+                                <span>{currentSnippet.status}</span>
+                                <span className="text-slate-500">Python 3.11</span>
                             </div>
                         </div>
                     </div>
