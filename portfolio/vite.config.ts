@@ -15,5 +15,12 @@ export default defineConfig({
     },
     server: {
         port: 3000,
+        host: true,
+        allowedHosts: true, // Allows all sandbox & preview URLs (*.vercel.run)
+    },
+    preview: {
+        port: 3000,
+        host: true,
+        allowedHosts: true,
     },
 });
