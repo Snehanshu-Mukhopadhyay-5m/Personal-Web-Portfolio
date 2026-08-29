@@ -8,6 +8,7 @@ import { SkillsSection } from './components/SkillsSection';
 import { ExperienceSection } from './components/ExperienceSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
+import { GateReveal } from './components/GateReveal';
 
 export const App: React.FC = () => {
     return (
@@ -15,13 +16,28 @@ export const App: React.FC = () => {
             <NeuralBackground />
             <div className="relative z-10">
                 <Navbar />
-                <main>
+                <main className="space-y-12 sm:space-y-20">
                     <Hero />
-                    <AttentionPlayground />
-                    <ProjectsSection />
-                    <SkillsSection />
-                    <ExperienceSection />
-                    <ContactSection />
+
+                    <GateReveal>
+                        <AttentionPlayground />
+                    </GateReveal>
+
+                    <GateReveal>
+                        <ProjectsSection />
+                    </GateReveal>
+
+                    <GateReveal>
+                        <SkillsSection />
+                    </GateReveal>
+
+                    <GateReveal>
+                        <ExperienceSection />
+                    </GateReveal>
+
+                    <GateReveal>
+                        <ContactSection />
+                    </GateReveal>
                 </main>
                 <Footer />
             </div>
